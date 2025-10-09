@@ -1,0 +1,32 @@
+# Large genomics data files
+*.bam
+*.bam.bai
+*.fq.gz
+*.fastq.gz
+*.fa
+*.fasta
+*.fa.gz
+*.fasta.gz
+
+# BWA indices
+*.amb
+*.ann
+*.bwt
+*.pac
+*.sa
+*.fai
+
+# Results directory
+results/
+
+# Data directories (large files)
+data/raw/
+data/reference/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Temporary files
+*.tmp
+*.log
