@@ -1,0 +1,35 @@
+# ChIP-seq Analysis Configuration
+
+# Reference genome
+reference:
+  genome: "data/reference/hg38_chr22.fa"
+  name: "hg38"
+
+# Analysis parameters
+macs2:
+  genome_size: "hs"
+  qvalue: 0.01
+  format: "BAMPE"
+  keep_dup: "all"
+
+# Quality control
+fastqc:
+  threads: 2
+
+# Alignment
+bwa:
+  threads: 4
+
+samtools:
+  threads: 2
+
+# Output directories
+directories:
+  raw_data: "data/raw"
+  reference: "data/reference"
+  aligned: "results/aligned"
+  qc: "results/qc"
+  peaks: "results/peaks"
+  analysis: "results/analysis"
+  plots: "results/plots"
+  reports: "reports"
