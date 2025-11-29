@@ -1,23 +1,24 @@
 import pandas as pd
-configfile: "config/config.yaml"
-samples_df = pd.read_csv("config/samples.tsv", sep="\t")
+configfile: "../../config/config.yaml"
+samples_df = pd.read_csv("../../config/samples.tsv", sep="\t")
 SAMPLES = samples_df["sample_name"].tolist()
 TREATMENTS = samples_df[samples_df["condition"] == "treatment"]["sample_name"].tolist()
-REFERENCE = "data/reference/hg38_chr22.fa"
+REFERENCE = "../../data/reference/hg38_chr22.fa"
 
 rule all:
     input:
         expand("results/aligned/{sample}.sorted.bam", sample=SAMPLES),
         expand("results/aligned/{sample}.sorted.bam.bai", sample=SAMPLES),
         expand("results/qc/fastqc/{sample}_{read}_fastqc.html", sample=SAMPLES, read=["R1", "R2"]),
-        "results/qc/multiqc/multiqc_report.html",
-        expand("results/peaks/{treatment}_peaks.narrowPeak", treatment=TREATMENTS)
+        "results/qc/multiqc/multiqc_report.html"
+#        expand("results/peaks/{treatment}_peaks.narrowPeak", treatment=TREATMENTS)
+
 
 rule bwa_align:
     input:
         ref=REFERENCE,
-        r1="data/raw/{sample}_R1.fastq.gz",
-        r2="data/raw/{sample}_R2.fastq.gz"
+        r1="../../data/raw/{sample}_R1.fastq.gz",
+        r2="../../data/raw/{sample}_R2.fastq.gz"
     output:
         temp("results/aligned/{sample}.bam")
     threads: 4
@@ -43,7 +44,7 @@ rule index_bam:
 
 rule fastqc:
     input:
-        "data/raw/{sample}_{read}.fastq.gz"
+        "../../data/raw/{sample}_{read}.fastq.gz"
     output:
         html="results/qc/fastqc/{sample}_{read}_fastqc.html",
         zip="results/qc/fastqc/{sample}_{read}_fastqc.zip"
@@ -62,16 +63,15 @@ rule multiqc:
     shell:
         "mkdir -p {params.outdir} && multiqc -o {params.outdir} results/qc/fastqc/"
 
-rule macs2_peaks:
-    input:
-        treatment="results/aligned/{treatment}.sorted.bam",
-        control="results/aligned/input_rep1.sorted.bam"
-    output:
-        narrowpeak="results/peaks/{treatment}_peaks.narrowPeak",
-        xls="results/peaks/{treatment}_peaks.xls"
-    params:
-        name="{treatment}",
-        outdir="results/peaks"
-    shell:
-        "mkdir -p {params.outdir} && macs2 callpeak -t {input.treatment} -c {input.control} -f BAMPE -g hs -n {params.name} --outdir {params.outdir} -q 0.01"
-    
+#rule macs3_peaks:
+#    input:
+#        treatment="results/aligned/{treatment}.sorted.bam",
+#        control="results/aligned/input_rep1.sorted.bam"
+#    output:
+#        narrowpeak="results/peaks/{treatment}_peaks.narrowPeak",
+#        xls="results/peaks/{treatment}_peaks.xls"
+#    params:
+#        name="{treatment}",
+#        outdir="results/peaks"
+#   shell:
+#        "mkdir -p {params.outdir} && macs3 callpeak -t {input.treatment} -c {input.control} -f BAMPE -g hs -n {params.name} --outdir {params.outdir} -q 0.01"    
