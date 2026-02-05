@@ -1,7 +1,7 @@
 # H3K4me3 ChIP-seq Analysis Pipeline
 
 ## Project Status
-🚧 **In Development** - Currently tested with simulated data
+**In Development** —Pipeline runs end-to-end. Next: analyze results, annotate peak regions, and inspect signal tracks in IGV.
 
 ## Overview
 Automated Snakemake workflow for identifying active gene promoters via H3K4me3 ChIP-seq analysis.
