@@ -1,3 +1,4 @@
-sample_name	condition	fastq_1	fastq_2	replicate
-h3k4me3_rep1	treatment	data/raw/h3k4me3_rep1_R1.fastq.gz	data/raw/h3k4me3_rep1_R2.fastq.gz	1
-input_rep1	control	data/raw/input_rep1_R1.fastq.gz	data/raw/input_rep1_R2.fastq.gz	1
+sample	condition	replicate
+chip_rep1	chip	1
+chip_rep2	chip	2
+control	input	1

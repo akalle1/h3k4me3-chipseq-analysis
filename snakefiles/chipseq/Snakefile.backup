@@ -1,52 +1,48 @@
 import pandas as pd
-import os
-configfile: "config/config.yaml"
-samples_df = pd.read_csv("config/samples.tsv", sep="\t")
+configfile: "../../config/config.yaml"
+samples_df = pd.read_csv("../../config/samples.tsv", sep="\t")
 SAMPLES = samples_df["sample"].tolist()
 TREATMENT = samples_df[samples_df["condition"] == "chip"]["sample"].tolist()
-REFERENCE = "data/reference/hg38_chr22.fa"
+REFERENCE = "../../data/reference/hg38_chr22.fa"
  
 rule all:
     input:
-        expand("results/qc/fastqc/{sample}_fastqc.html", sample=SAMPLES),
-        "results/qc/multiqc/multiqc_report.html",
         expand("results/aligned/{sample}.sorted.bam", sample=SAMPLES),
         expand("results/aligned/{sample}.sorted.bam.bai", sample=SAMPLES),
-        expand("results/peaks/{sample}_peaks.narrowPeak", sample=TREATMENT)
+        expand("results/qc/fastqc/{sample}_fastqc.html", sample=SAMPLES),
+        "results/qc/multiqc/multiqc_report.html"
+        expand("results/peaks/{sample}_peaks.narrowPeak", sample=TREATMENTS)
 
 rule fastqc:
     input:
-        "data/raw/{sample}.fastq.gz"
+        "../../data/raw/{sample}.fastq.gz"
     output:
         html="results/qc/fastqc/{sample}_fastqc.html",
         zip="results/qc/fastqc/{sample}_fastqc.zip"
     threads: 2
-    log:
-        "log/fastqc/{sample}.log"
     shell:
         "fastqc {input} -o results/qc/fastqc/ -t {threads}"
 
 rule bwa_align:
     input:
-        fq = "data/raw/{sample}.fastq.gz",
-        ref=REFERENCE
+        fq = "../../data/raw/{sample}.fastq.gz",
+	ref=REFERENCE
     output:
         temp("results/aligned/{sample}.sam")
     threads: 4
     log:
-        "log/bwa/{sample}.log"
+	"log/bwa/{sample}.log"
     shell:
         "bwa mem -t {threads} {input.ref} {input.fq} > {output} 2> {log}"
 
 rule sam_to_bam:
     input:
-    	"results/aligned/{sample}.sam"
+	"results/aligned/{sample}.sam"
     output:
-    	"results/aligned/{sample}.sorted.bam"
-    log:
-        "log/samtools/sort/{sample}.log"
+	"results/aligned/{sample}.sorted.bam"
+    threads: 4
     shell:
-        "samtools sort -@ {threads} -o {output} {input}"
+        "samtools sort -@ -threads -o {output} {input}"
 #bam file is already sorted
 
 rule index_bam:
@@ -54,24 +50,22 @@ rule index_bam:
         "results/aligned/{sample}.sorted.bam"
     output:
         "results/aligned/{sample}.sorted.bam.bai"
-    log:
-        "log/samtools/index/{sample}.log"
     shell:
         "samtools index {input}"
 
 rule call_peaks:
     input:
-        treatment="results/aligned/{sample}.sorted.bam",        
-        control="results/aligned/control.sorted.bam"
+       	treatment="results/aligned/{sample}.sorted.bam",        
+	control="results/aligned/control.sorted.bam"
     output:
         narrowpeak="results/peaks/{sample}_peaks.narrowPeak",
         xls="results/peaks/{sample}_peaks.xls",
-        summits="results/peaks/{sample}_summits.bed"
+	summits="results/peaks/{sample}_summits.bed"
     params:
         name="{sample}",
-        outdir=lambda wc, output: os.path.dirname(output.narrowpeak)
+        outdir="results/peaks"
     log:
-        "log/macs/{sample}.log"
+        "logs/macs/{sample}.log"
     shell:
        "mkdir -p {params.outdir} && macs3 callpeak -t {input.treatment} -c {input.control} -f BAM -g hs -n {params.name} --outdir {params.outdir} -q 0.05 2> {log}"    
 
@@ -81,8 +75,6 @@ rule multiqc:
     output:
         "results/qc/multiqc/multiqc_report.html"
     params:
-        outdir=lambda wc, output: os.path.dirname(output[0])
-    log:
-        "log/multiqc/multiqc.log"
+        outdir="results/qc/multiqc"
     shell:
         "mkdir -p {params.outdir} && multiqc -o {params.outdir} results/qc/fastqc/"
