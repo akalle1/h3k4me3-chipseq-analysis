@@ -20,10 +20,9 @@ Raw FASTQ → QC → Alignment → Sorting → Indexing → Peak Calling → Rep
 ## Current Status
 - ✅ Pipeline structure complete
 - ✅ All rules functional with test data
-- ⏳ Awaiting real ENCODE data download
+- ✅ real ENCODE data download
 - ⏳ Results validation pending
 
 ## Next Steps
-- Download ENCODE K562 H3K4me3 data (chr22)
 - Validate peak calling results
 - Generate visualization outputs
