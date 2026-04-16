@@ -2,7 +2,7 @@
 
 # Reference genome
 reference:
-  genome: "data/reference/hg38_chr22.fa"
+  genome: "data/reference/hg38.analysisSet.fa"
   name: "hg38"
 
 # Analysis parameters

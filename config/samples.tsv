@@ -1,4 +1,5 @@
 sample	condition	replicate
-chip_rep1	chip	1
 chip_rep2	chip	2
+chip_rep3	chip	3
 control	input	1
+
