@@ -34,3 +34,5 @@ __pycache__/
 
 # Snakemake metadata/cache
 .snakemake/
+.snakemake/
+.snakemake/
